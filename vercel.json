@@ -28,10 +28,6 @@
       "dest": "/api/health.js"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|webm|mp4|mp3|woff|woff2|ttf|eot|otf))",
-      "dest": "/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
