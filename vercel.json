@@ -6,6 +6,14 @@
       "use": "@vercel/static"
     },
     {
+      "src": "dashboard.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "professional-dashboard.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/**/*.js",
       "use": "@vercel/node"
     }
