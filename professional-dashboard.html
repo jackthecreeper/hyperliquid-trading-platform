@@ -504,8 +504,8 @@
                     </tr>
                 `;
 
-        // Fetch data from our API
-        const response = await fetch('/api/crypto-prices');
+                // Fetch data from our API (Netlify serverless function)
+                const response = await fetch('/.netlify/functions/api/crypto-prices');
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -755,8 +755,8 @@
                     </tr>
                 `;
 
-                // Fetch data from our API
-                const response = await fetch('http://localhost:3000/api/crypto-prices');
+                // Fetch data from our API (Netlify serverless function)
+                const response = await fetch('/.netlify/functions/api/crypto-prices');
                 const result = await response.json();
 
                 if (result.status === 'success') {
