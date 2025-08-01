@@ -75,6 +75,20 @@ hyperliquid/
 
 ## Deployment on Netlify
 
+### Local Development with Netlify CLI
+
+To test Netlify functions locally, first install the Netlify CLI:
+```bash
+# Option 1: Install globally
+npm install -g netlify-cli
+
+# Option 2: Use npx (no global installation needed)
+npx netlify dev
+```
+
+> ℹ️ Global installation is recommended for frequent local testing. The `functions/` directory will be properly recognized by Netlify's development server.
+
+
 To deploy this project on Netlify:
 
 1. **Connect your GitHub repository:**
