@@ -681,7 +681,7 @@
                 `;
 
         // Fetch data from our API
-        const response = await fetch('/api/crypto-prices');
+        const response = await fetch('http://localhost:3000/api/crypto-prices');
                 const result = await response.json();
 
                 if (result.status === 'success') {
