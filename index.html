@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperliquid</title>
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        primary: '#1e293b',
+                        accent: '#10b981',
+                        'accent-dark': '#059669'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+        }
+        .crypto-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .crypto-table th, .crypto-table td {
+            border-bottom: 1px solid #1e293b;
+        }
+        .crypto-table th {
+            background-color: #1e293b;
+        }
+        .change-positive {
+            color: #10b981;
+        }
+        .change-negative {
+            color: #ef4444;
+        }
+        .glow-green {
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-dark flex items-center justify-center z-50">
+        <img src="blob_green.gif" alt="Loading..." class="w-32 h-32">
+    </div>
+
+    <div id="mainContent" class="container mx-auto px-4 py-8 opacity-0 transition-opacity duration-500">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-12">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center mr-3">
+                    <img src="blob_green.gif" alt="Hyperliquid Logo" class="w-8 h-8">
+                </div>
+                <h1 class="text-2xl font-bold">Hyperliquid</h1>
+            </div>
+            <div>
+                <button id="connectWallet" class="px-6 py-2 bg-accent hover:bg-accent-dark rounded-lg font-medium transition duration-300 glow-green">
+                    Connect Wallet
+                </button>
+                <div id="walletInfo" class="hidden">
+                    <span id="walletAddress" class="px-4 py-2 bg-primary rounded-lg"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section -->
+            <section class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Trade Crypto with Confidence</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">Connect your wallet to start trading with real-time market data</p>
+                <div id="connectPrompt" class="max-w-md mx-auto">
+                    <p class="mb-6">Please connect your Web3 wallet to access the trading platform</p>
+                    <button id="connectWalletHero" class="px-8 py-3 bg-accent hover:bg-accent-dark rounded-lg font-medium text-lg transition duration-300 glow-green">
+                        Connect Wallet
+                    </button>
+                </div>
+                <div id="dashboardLink" class="hidden">
+                    <a href="dashboard.html" class="px-8 py-3 bg-accent hover:bg-accent-dark rounded-lg font-medium text-lg transition duration-300 inline-block">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-accent text-2xl mb-4">🔒</div>
+                    <h3 class="text-xl font-bold mb-2">Secure Trading</h3>
+                    <p class="text-gray-400">All transactions are secured through MetaMask wallet integration</p>
+                </div>
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-accent text-2xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold mb-2">Real-time Data</h3>
+                    <p class="text-gray-400">Access live cryptocurrency prices from CoinMarketCap API</p>
+                </div>
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-accent text-2xl mb-4">💰</div>
+                    <h3 class="text-xl font-bold mb-2">Easy Deposits</h3>
+                    <p class="text-gray-400">Deposit ETH or USDT to the provided wallet address</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 pt-8 border-t border-primary text-gray-500">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p>© 2025 Hyperliquid. All rights reserved.</p>
+                    </div>
+                    <div class="mb-4 md:mb-0">
+                        <img src="blob_green.gif" alt="Hyperliquid Logo" class="h-8">
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="terms.html" class="text-accent hover:text-accent-dark transition duration-300">Terms</a>
+                        <a href="privacy-policy.html" class="text-accent hover:text-accent-dark transition duration-300">Privacy Policy</a>
+                        <a href="https://hyperliquid.gitbook.io/hyperliquid-docs" target="_blank" class="text-accent hover:text-accent-dark transition duration-300">Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script>
+        // Loading screen functionality
+        window.addEventListener('load', function() {
+            // Set a timeout to hide the loading screen after 4 seconds
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (loadingScreen && mainContent) {
+                    // Fade out the loading screen
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.transition = 'opacity 0.5s ease-out';
+                    
+                    // After fade out, hide the loading screen and show content
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                        mainContent.classList.remove('opacity-0');
+                    }, 500);
+                }
+            }, 4000);
+        });
+
+        // Check if wallet is already connected
+        window.addEventListener('load', async function() {
+            if (typeof window.ethereum !== 'undefined') {
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    document.getElementById('connectPrompt').classList.add('hidden');
+                    document.getElementById('dashboardLink').classList.remove('hidden');
+                    document.getElementById('connectWallet').classList.add('hidden');
+                    document.getElementById('walletInfo').classList.remove('hidden');
+                    document.getElementById('walletAddress').textContent = `${accounts[0].substring(0, 6)}...${accounts[0].substring(accounts[0].length - 4)}`;
+                }
+            }
+        });
+
+        // Connect wallet function
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('connectPrompt').classList.add('hidden');
+                    document.getElementById('dashboardLink').classList.remove('hidden');
+                    document.getElementById('connectWallet').classList.add('hidden');
+                    document.getElementById('walletInfo').classList.remove('hidden');
+                    document.getElementById('walletAddress').textContent = `${accounts[0].substring(0, 6)}...${accounts[0].substring(accounts[0].length - 4)}`;
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                alert("MetaMask is not installed. Please install MetaMask to use this feature.");
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('connectWalletHero').addEventListener('click', connectWallet);
+    </script>
+</body>
+</html>
