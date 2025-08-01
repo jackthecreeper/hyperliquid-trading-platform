@@ -7,7 +7,9 @@ const CMC_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listing
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-CMC_PRO_API_KEY');
+  res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight request for 24 hours
 
   if (req.method === 'GET') {
     try {
@@ -43,7 +45,8 @@ module.exports = async (req, res) => {
       // Send error response
       res.status(500).json({
         status: 'error',
-        message: 'Failed to fetch cryptocurrency prices'
+        message: 'Failed to fetch cryptocurrency prices',
+        details: error.message
       });
     }
   } else if (req.method === 'OPTIONS') {
