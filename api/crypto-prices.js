@@ -35,19 +35,27 @@ module.exports = async (req, res) => {
         marketCap: crypto.quote.USD.market_cap
       }));
 
-      res.status(200).json({
+      // Ensure proper JSON response
+      const responseData = {
         status: 'success',
         data: cryptoData
-      });
+      };
+
+      // Set content type and send response
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(JSON.stringify(responseData));
     } catch (error) {
       console.error('Error fetching crypto prices:', error.message);
       
       // Send error response
-      res.status(500).json({
+      const errorResponse = {
         status: 'error',
         message: 'Failed to fetch cryptocurrency prices',
         details: error.message
-      });
+      };
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).send(JSON.stringify(errorResponse));
     }
   } else if (req.method === 'OPTIONS') {
     // Handle preflight requests
