@@ -1,8 +1,3 @@
-
-Built by https://www.blackbox.ai
-
----
-
 # Hyperliquid
 
 ## Project Overview
@@ -68,16 +63,43 @@ hyperliquid/
 │   ├── favicon.ico
 │   ├── favicon-16x16.png
 │   └── favicon-32x32.png
-├── src/
-│   ├── index.html           # Main entry point for the application
-│   ├── dashboard.html       # Dashboard for viewing statistics
-│   ├── professional-dashboard.html # Professional trading dashboard
-│   ├── privacy-policy.html  # Privacy policy page
-│   ├── terms.html           # Terms of use page
-│   └── server.js            # Node.js server file
-├── package.json              # Package configuration file
-└── package-lock.json         # Locked dependency versions
+├── index.html               # Main entry point for the application
+├── dashboard.html           # Dashboard for viewing statistics
+├── professional-dashboard.html # Professional trading dashboard
+├── privacy-policy.html      # Privacy policy page
+├── terms.html               # Terms of use page
+├── server.js                # Node.js server file
+├── package.json             # Package configuration file
+└── package-lock.json        # Locked dependency versions
 ```
+
+## Deployment on Netlify
+
+To deploy this project on Netlify:
+
+1. **Connect your GitHub repository:**
+   - Go to [Netlify Dashboard](https://app.netlify.com/)
+   - Click "New site from Git"
+   - Connect your GitHub account and select this repository
+
+2. **Configure environment variables:**
+   - In Netlify dashboard, go to "Site settings > Build environment > Environment"
+   - Add the following variable:
+     ```bash
+     CMC_API_KEY=your_coinmarketcap_api_key
+     ```
+     (Replace with your actual [CoinMarketCap API key](https://coinmarketcap.com/api/))
+
+3. **Build settings:**
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+   - Functions directory: `functions`
+
+4. **Deploy:**
+   - Netlify will automatically build and deploy your site
+   - Your serverless functions will be available at `/.netlify/functions/api/crypto-prices`
+
+> ⚠️ Make sure to remove the placeholder API key (`bf200802-c966-4dff-ac0e-de3f350ef491`) from `functions/api/crypto-prices.js` and use your actual CoinMarketCap API key in Netlify's environment variables.
 
 ### Contributing
 Contributions are welcome! Please fork the repository, make your changes, and submit a pull request.
