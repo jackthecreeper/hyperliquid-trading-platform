@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // CoinMarketCap API configuration
-const CMC_API_KEY = process.env.CMC_API_KEY || 'bf200802-c966-4dff-ac0e-de3f350ef491';
+const CMC_API_KEY = process.env.CMC_API_KEY;
 
 // Netlify serverless function handler
 exports.handler = async (event, context) => {
