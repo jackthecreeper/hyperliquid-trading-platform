@@ -1,4 +1,4 @@
-const axios = require('axios');
+const fetch = require('node-fetch');
 
 // CoinMarketCap API configuration
 const CMC_API_KEY = process.env.CMC_API_KEY;
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
     url.searchParams.append('convert', 'USD');
     
     // Fetch data from CoinMarketcap API
-    const response = await fetch(url.toString(), {
+                const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'X-CMC_PRO_API_KEY': CMC_API_KEY,
@@ -41,8 +41,13 @@ exports.handler = async (event, context) => {
     
     const data = await response.json();
     
-    // Process the data to match the format expected by the frontend
-    const cryptoData = data.data.map(crypto => ({
+                // Add detailed error handling for API requests
+                if (!response.ok) {
+                    throw new Error(`CoinMarketCap API responded with status ${response.status}`);
+                }
+                
+                // Process the data to match the format expected by the frontend
+                const cryptoData = data.data.map(crypto => ({
       id: crypto.id,
       name: crypto.name,
       symbol: crypto.symbol,
