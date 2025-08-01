@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // CoinMarketCap API configuration
-const CMC_API_KEY = process.env.CMC_API_KEY || '92fe215e-edac-4a39-9b6c-f4bb30805ec4';
+const CMC_API_KEY = process.env.CMC_API_KEY || 'bf200802-c966-4dff-ac0e-de3f350ef491';
 const CMC_API_URL = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest';
 
 module.exports = async (req, res) => {
