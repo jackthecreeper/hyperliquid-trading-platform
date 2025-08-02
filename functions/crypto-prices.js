@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 // Netlify serverless function handler
 exports.handler = async (event, context) => {
