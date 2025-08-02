@@ -51,7 +51,8 @@ exports.handler = async (event, context) => {
       symbol: crypto.symbol,
       price: crypto.current_price,
       change24h: crypto.price_change_percentage_24h,
-      marketCap: crypto.market_cap
+      marketCap: crypto.market_cap,
+      image: crypto.image
     }));
 
     return {
