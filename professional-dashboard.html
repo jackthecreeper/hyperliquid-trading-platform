@@ -455,37 +455,13 @@
         }
 
         // Get crypto icon with actual logos
-        function getCryptoIcon(symbol) {
-            // Map common cryptocurrencies to their SVG logo files
-            const logoUrls = {
-                'BTC': 'crypto-logo/bitcoin-btc-logo.svg',
-                'ETH': 'crypto-logo/ethereum-eth-logo.svg',
-                'USDT': 'crypto-logo/tether-usdt-logo.svg',
-                'USDC': 'crypto-logo/usd-coin-usdc-logo.svg',
-                'BNB': 'crypto-logo/bnb-bnb-logo.svg',
-                'SOL': 'crypto-logo/solana-sol-logo.svg',
-                'XRP': 'crypto-logo/xrp-xrp-logo.svg',
-                'ADA': 'crypto-logo/cardano-ada-logo.svg',
-                'DOGE': 'crypto-logo/dogecoin-doge-logo.svg',
-                'AVAX': 'crypto-logo/avalanche-avax-logo.svg',
-                'TRX': 'crypto-logo/tron-trx-logo.svg',
-                'BCH': 'crypto-logo/bitcoin-cash-bch-logo.svg',
-                'SUI': 'crypto-logo/sui-sui-logo.svg',
-                'LEO': 'crypto-logo/unus-sed-leo-leo-logo.svg',
-                'TON': 'crypto-logo/toncoin-ton-logo.svg',
-                'USDe': 'crypto-logo/ethena-usde-usde-logo.svg',
-                'HBAR': 'crypto-logo/hedera-hbar-logo.svg',
-                'LINK': 'crypto-logo/chainlink-link-logo.svg',
-                'XLM': 'crypto-logo/stellar-xlm-logo.svg',
-                'HYPE': 'crypto-logo/hyper-foundation.svg'
-            };
-            
-            // Get the logo URL or use a default placeholder
-            const logoUrl = logoUrls[symbol] || `https://placehold.co/32x32/334155/white?text=${symbol.charAt(0)}`;
+        function getCryptoIcon(symbol, imageUrl) {
+            // Use the CoinGecko API image URL if available, otherwise use a placeholder
+            const logoUrl = imageUrl || `https://placehold.co/32x32/334155/white?text=${symbol.charAt(0)}`;
             
             // Return the icon HTML
             return `
-                <img src="${logoUrl}" alt="${symbol} logo" class="w-8 h-8 rounded-full">
+                <img src="${logoUrl}" alt="${symbol} logo" class="w-8 h-8 rounded-full" onerror="this.src='https://placehold.co/32x32/334155/white?text=${symbol.charAt(0)}'">
             `;
         }
 
