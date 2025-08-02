@@ -1,15 +1,12 @@
 const fetch = require('node-fetch');
 
-// CoinMarketCap API configuration
-const CMC_API_KEY = process.env.CMC_API_KEY;
-
 // Netlify serverless function handler
 exports.handler = async (event, context) => {
   // CORS headers configuration
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, X-CMC_PRO_API_KEY',
+    'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
     'Access-Control-Max-Age': '86400',
     'Content-Type': 'application/json'
   };
@@ -24,36 +21,37 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Construct URL with query parameters
-    const url = new URL('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest');
-    url.searchParams.append('start', '1');
-    url.searchParams.append('limit', '100');
-    url.searchParams.append('convert', 'USD');
+    // Construct URL with query parameters for CoinGecko API
+    const url = new URL('https://api.coingecko.com/api/v3/coins/markets');
+    url.searchParams.append('vs_currency', 'usd');
+    url.searchParams.append('order', 'market_cap_desc');
+    url.searchParams.append('per_page', '20');
+    url.searchParams.append('page', '1');
+    url.searchParams.append('sparkline', 'false');
     
-    // Fetch data from CoinMarketcap API
-                const response = await fetch(url.toString(), {
+    // Fetch data from CoinGecko API
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
-        'X-CMC_PRO_API_KEY': CMC_API_KEY,
         'Accept': 'application/json'
       }
     });
     
+    // Add detailed error handling for API requests
+    if (!response.ok) {
+      throw new Error(`CoinGecko API responded with status ${response.status}`);
+    }
+    
     const data = await response.json();
     
-                // Add detailed error handling for API requests
-                if (!response.ok) {
-                    throw new Error(`CoinMarketCap API responded with status ${response.status}`);
-                }
-                
-                // Process the data to match the format expected by the frontend
-                const cryptoData = data.data.map(crypto => ({
+    // Process the data to match the format expected by the frontend
+    const cryptoData = data.map(crypto => ({
       id: crypto.id,
       name: crypto.name,
       symbol: crypto.symbol,
-      price: crypto.quote.USD.price,
-      change24h: crypto.quote.USD.percent_change_24h,
-      marketCap: crypto.quote.USD.market_cap
+      price: crypto.current_price,
+      change24h: crypto.price_change_percentage_24h,
+      marketCap: crypto.market_cap
     }));
 
     return {
